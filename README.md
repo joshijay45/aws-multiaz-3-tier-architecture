@@ -1,38 +1,44 @@
-# AWS Highly Available 3-Tier Architecture
+# Highly Available AWS 3-Tier Architecture:
 
-## Overview
-A production-ready, fault-tolerant 3-tier web application architecture provisioned entirely through Infrastructure as Code (IaC). This project demonstrates how to securely isolate database tiers, manage dynamic traffic scaling, and ensure high availability across multiple AWS Availability Zones.
+This project is a classic, enterprise-grade network setup for a website. It is called a "3-Tier" architecture because it separates the website into three distinct layers: the public front-end, the private application servers, and the hidden database.
 
-## Architecture Diagram
-![Architecture Diagram](./images/architecture.png)
+This setup is designed to be Highly Available (if a server crashes, the website stays online) and Highly Secure (hackers cannot reach the database directly). The entire network is built from scratch using Terraform.
 
-## Core Technologies
-- **Infrastructure as Code:** Terraform
-- **Networking:** AWS VPC, Public & Private Subnets, NAT Gateway, Route Tables
-- **Compute:** AWS EC2, Auto Scaling Groups (ASG)
-- **Load Balancing:** Application Load Balancer (ALB)
-- **Database:** AWS RDS (MySQL/PostgreSQL)
-- **Security:** Security Groups, IAM Roles
+# How It Works (The 3 Tiers):
+ The Web Tier (Public):
+When a user visits the website, they hit an Application Load Balancer (ALB). The load balancer's job is to distribute traffic evenly across multiple web servers. If one web server breaks, the load balancer stops sending people to it.
 
-## Infrastructure Architecture
-1. **Web/Presentation Tier:** Application Load Balancer routes incoming internet traffic across multiple Availability Zones.
-2. **Application Tier:** EC2 instances managed by an Auto Scaling Group sit in private subnets, dynamically scaling based on CPU utilization.
-3. **Database Tier:** A highly available RDS database resides in a separate, isolated private subnet, accessible only by the application tier.
+The Application Tier (Private):
+This is where the actual code runs. These servers are placed in private subnets, meaning they do not have public IP addresses and cannot be accessed directly from the internet. They can only talk to the Load Balancer and the Database.
 
-## How to Deploy
-1. **Prerequisites:** Install [Terraform](https://developer.hashicorp.com/terraform/downloads) and configure your [AWS CLI credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
-2. Clone this repository.
-3. Initialize Terraform: `terraform init`
-4. Review plan: `terraform plan`
-5. Deploy infrastructure: `terraform apply`
+The Database Tier (Private):
+This holds the website's data using Amazon RDS (Relational Database Service). It is locked down in the deepest part of the private network. Only the Application servers are allowed to talk to it.
 
-   git clone [https://github.com/joshijay45/aws-multiaz-3-tier-architecture.git]
-   cd aws-multiaz-3-tier-architecture
+Bonus: Auto Scaling & NAT Gateways
 
-## Things to be aware of 
-NAT gateway has cost per hour if you deploying the infrastructure make sure you pay fisrt 
-Set MultiAZ deployment to false to for RDS database to avoid massive bill charge 
+Auto Scaling: If the website gets a sudden spike in traffic, AWS will automatically create new servers to handle the load, and delete them when traffic goes back down.
 
-## Cleaun up the infrastructure 
+NAT Gateway: Because our private servers don't have internet access, they use a NAT Gateway to safely reach out to the internet to download software updates without exposing themselves to incoming attacks.
 
-1. `terraform destroy`
+ # Tech Stack Used :
+
+ Infrastructure as code: Terraform
+
+Networking: AWS VPC, Public/Private Subnets, Route Tables, NAT Gateways
+
+Compute: Amazon EC2, Auto Scaling Groups, Application Load Balancer
+
+Database: Amazon RDS (MySQL)
+
+# How to Deploy :
+
+Clone this repository.
+ git clone [https://github.com/joshijay45/aws-multiaz-3-tier-architecture.git]
+
+Run terraform init to set up your environment.
+
+Run terraform apply -auto-approve to build the network.
+
+Copy the Load Balancer's URL from the terminal output and paste it into your browser to see the live website!
+
+Note: Run terraform destroy when finished to avoid NAT Gateway charges.
