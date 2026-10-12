@@ -41,4 +41,4 @@ Run terraform apply -auto-approve to build the network.
 
 Copy the Load Balancer's URL from the terminal output and paste it into your browser to see the live website!
 
-Note: Run terraform destroy when finished to avoid NAT Gateway charges.
+Note: 1.Run terraform destroy when finished to avoid NAT Gateway charges. 2. I have kept Multi-AZ deployment to false for RDS instance to save cost.
