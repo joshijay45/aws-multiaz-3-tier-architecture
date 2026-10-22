@@ -5,7 +5,7 @@ data "aws_ssm_parameter" "ami" {
 resource "aws_launch_template" "app_launch_template" {
   name_prefix   = "${var.project_name}-lt-"
   image_id = data.aws_ssm_parameter.ami.value
-  instance_type = "t3.micro"
+  instance_type = "t2.nano" # t3.micro
 
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   user_data = filebase64("${path.module}/scripts/userdata.sh")
@@ -17,8 +17,9 @@ resource "aws_launch_template" "app_launch_template" {
 
 resource "aws_autoscaling_group" "app_asg" {
   name = "${var.project_name}-app-asg"
+  vpc_zone_identifier = [aws_subnet.private_subnet2.id, aws_subnet.private_subnet1.id]
 
-  vpc_zone_identifier = [ aws_subnet.private_subnet1.id , aws_subnet.private_subnet2.id ]
+  #vpc_zone_identifier = [ aws_subnet.private_subnet1.id , aws_subnet.private_subnet2.id ]
 
   min_size = 2
   max_size = 4

@@ -10,7 +10,7 @@ INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.2
 AZ=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
 
 # Build a dynamic webpage that proves which server is responding
-cat <<EOF > /var/www/html/index.html
+cat << 'EOF' > /var/www/html/index.html
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,8 +20,13 @@ cat <<EOF > /var/www/html/index.html
 <body>
   <h1> Highly Available Multi-AZ App</h1>
   <p>If you refresh this page, the Instance ID will change as the Load Balancer shifts traffic!</p>
-  <h2 style="color: #ff9900;">Responding from AZ: \${AZ}</h2>
-  <h3>Server ID: \${INSTANCE_ID}</h3>
+EOF
+
+# Inject the dynamic bash variables into the HTML file cleanly
+echo "  <h2 style=\"color: #ff9900;\">Responding from AZ: $AZ</h2>" >> /var/www/html/index.html
+echo "  <h3>Server ID: $INSTANCE_ID</h3>" >> /var/www/html/index.html
+
+cat << 'EOF' >> /var/www/html/index.html
 </body>
 </html>
 EOF
