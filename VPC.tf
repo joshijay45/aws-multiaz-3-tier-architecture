@@ -85,11 +85,44 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "pub_sub1" {
-  subnet_id      = aws_subnet.public_subnet1.id
+  subnet_id = aws_subnet.public_subnet1.id
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route_table_association" "pub_sub2" {
-  subnet_id      = aws_subnet.public_subnet2.id
+  subnet_id = aws_subnet.public_subnet2.id
   route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table" "private" {
+vpc_id = aws_vpc.app_vpc.id
+
+route {
+cidr_block     = "0.0.0.0/0"
+nat_gateway_id = aws_nat_gateway.nat_gw.id
+}
+
+tags = {
+Name = "${var.project_name}-private-rt"
+}
+}
+
+resource "aws_route_table_association" "priv_sub1" {
+subnet_id = aws_subnet.private_subnet1.id
+route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "priv_sub2" {
+subnet_id = aws_subnet.private_subnet2.id
+route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "db_sub1" {
+subnet_id  = aws_subnet.private_subnet3.id
+route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "db_sub2" {
+subnet_id = aws_subnet.private_subnet4.id
+route_table_id = aws_route_table.private.id
 }
